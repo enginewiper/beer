@@ -1,5 +1,7 @@
+import pandas as pd
+
 # TABC
-#Malt Liquor
+# Malt Liquor
 '''
 1.   Inventory, Beginning of Month  (Line 6 on Prior Monthly Report)
 2.   Ale/Malt Liquor Brewed (Gallons Bottled & Kegged)
@@ -25,7 +27,7 @@ LESS AUTHORIZED CREDITS (Attach TABC letter)
 TAX DUE STATE
 '''
 
-#Beer
+# Beer
 '''
 1.   Inventory, Beginning of Month  (Line 6 on Prior Monthly Report)
 2.   Beer Manufactured (Gallons Bottled & Kegged)
@@ -51,7 +53,7 @@ LESS AUTHORIZED CREDITS (Attach TABC letter)
 TAX DUE STATE
 '''
 
-#Comptroller
+# Comptroller
 
 '''
 1. Seller's TABC Permit or License Numbers
@@ -251,3 +253,16 @@ should include any applicable discounts
 
  This is a mandatory field
 '''
+
+invPath = 'inventory.xlsx'
+productsPath = 'Products.xlsx'
+
+dfInv = pd.io.excel.read_excel(invPath)
+dfProducts = pd.io.excel.read_excel(productsPath)
+#print(df)
+
+for row in dfInv.iterrows():
+    print(row)
+
+for row in dfProducts.iterrows():
+    print(row)
