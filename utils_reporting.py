@@ -1,4 +1,12 @@
 import pandas as pd
+from datetime import date, timedelta
+
+
+def is_current_reporting_period(transactiondate):
+    last_day_of_prev_month = date.today().replace(day=1) - timedelta(days=1)
+    start_day_of_prev_month = date.today().replace(day=1) - timedelta(days=last_day_of_prev_month.day)
+    return start_day_of_prev_month <= transactiondate <= last_day_of_prev_month
+
 
 # TABC
 # Malt Liquor
@@ -254,15 +262,32 @@ should include any applicable discounts
  This is a mandatory field
 '''
 
-invPath = 'inventory.xlsx'
+invPath = 'Inventory.xlsx'
 productsPath = 'Products.xlsx'
+retailerCustomersPath = 'RetailerCustomers.xlsx'
+transactionsPath = 'Transactions.xlsx'
 
 dfInv = pd.io.excel.read_excel(invPath)
 dfProducts = pd.io.excel.read_excel(productsPath)
-#print(df)
+dfRetailerCustomers = pd.io.excel.read_excel(retailerCustomersPath)
+dfTransactions = pd.io.excel.read_excel(transactionsPath)
 
-for row in dfInv.iterrows():
-    print(row)
+# print(df)
 
-for row in dfProducts.iterrows():
-    print(row)
+#for row in dfInv.iterrows():
+#    print(row)
+
+#for row in dfProducts.iterrows():
+#    print(row)
+
+#for row in dfRetailerCustomers.iterrows():
+#    print(row)
+
+#for row in dfTransactions.iterrows():
+    #print(row[])
+ #   print(row)
+
+for row in dfTransactions.itertuples(index=False):
+    #print(is_current_reporting_period(row[dfTransactions.columns.get_loc('Date')]))
+    if is_current_reporting_period(row[dfTransactions.columns.get_loc('Date')]):
+        #include this transaction in the list of transactions to process for reporting
