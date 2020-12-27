@@ -291,3 +291,10 @@ for row in dfTransactions.itertuples(index=False):
     #print(is_current_reporting_period(row[dfTransactions.columns.get_loc('Date')]))
     if is_current_reporting_period(row[dfTransactions.columns.get_loc('Date')]):
         #include this transaction in the list of transactions to process for reporting
+        pass
+    print(row[dfTransactions.columns.get_loc('Date')]))
+    print(row[dfTransactions.columns.get_loc('ProductID')])
+    print(row[dfTransactions.columns.get_loc('InternalCustomerID')])
+    print(row[dfTransactions.columns.get_loc('ContainerSize')])
+    print(row[dfTransactions.columns.get_loc('ContainerUnits')])
+    print(row[dfTransactions.columns.get_loc('OffPrem')])
