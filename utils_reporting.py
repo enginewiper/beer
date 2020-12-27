@@ -2,6 +2,7 @@ import pandas as pd
 from datetime import date, timedelta
 
 
+# is a transaction date within the previous month? boolean
 def is_current_reporting_period(transactiondate):
     last_day_of_prev_month = date.today().replace(day=1) - timedelta(days=1)
     start_day_of_prev_month = date.today().replace(day=1) - timedelta(days=last_day_of_prev_month.day)
@@ -262,11 +263,13 @@ should include any applicable discounts
  This is a mandatory field
 '''
 
+# set paths
 invPath = 'Inventory.xlsx'
 productsPath = 'Products.xlsx'
 retailerCustomersPath = 'RetailerCustomers.xlsx'
 transactionsPath = 'Transactions.xlsx'
 
+# load in excel sheets as pandas data frames
 dfInv = pd.io.excel.read_excel(invPath)
 dfProducts = pd.io.excel.read_excel(productsPath)
 dfRetailerCustomers = pd.io.excel.read_excel(retailerCustomersPath)
@@ -274,27 +277,89 @@ dfTransactions = pd.io.excel.read_excel(transactionsPath)
 
 # print(df)
 
-#for row in dfInv.iterrows():
+# for row in dfInv.iterrows():
 #    print(row)
 
-#for row in dfProducts.iterrows():
+# for row in dfProducts.iterrows():
 #    print(row)
 
-#for row in dfRetailerCustomers.iterrows():
+# for row in dfRetailerCustomers.iterrows():
 #    print(row)
 
-#for row in dfTransactions.iterrows():
-    #print(row[])
- #   print(row)
+# for row in dfTransactions.iterrows():
+# print(row[])
+#   print(row)
 
+# figure out which transactions were in the previous month
 for row in dfTransactions.itertuples(index=False):
-    #print(is_current_reporting_period(row[dfTransactions.columns.get_loc('Date')]))
+    # print(is_current_reporting_period(row[dfTransactions.columns.get_loc('Date')]))
     if is_current_reporting_period(row[dfTransactions.columns.get_loc('Date')]):
-        #include this transaction in the list of transactions to process for reporting
-        pass
-    print(row[dfTransactions.columns.get_loc('Date')]))
-    print(row[dfTransactions.columns.get_loc('ProductID')])
-    print(row[dfTransactions.columns.get_loc('InternalCustomerID')])
-    print(row[dfTransactions.columns.get_loc('ContainerSize')])
-    print(row[dfTransactions.columns.get_loc('ContainerUnits')])
-    print(row[dfTransactions.columns.get_loc('OffPrem')])
+        # include this transaction in the list of transactions to process for reporting
+        print('dump transaction info:')
+        print(row[dfTransactions.columns.get_loc('Date')])
+        print(row[dfTransactions.columns.get_loc('ProductID')])
+        print(row[dfTransactions.columns.get_loc('InternalCustomerID')])
+        print(row[dfTransactions.columns.get_loc('ContainerSize')])
+        print(row[dfTransactions.columns.get_loc('ContainerUnits')])
+        print(row[dfTransactions.columns.get_loc('OffPrem')])
+
+        # get information about retailer customer based on internalCustomerID,
+        # and convert df to dict
+        internalCustomerID = row[dfTransactions.columns.get_loc('InternalCustomerID')]
+        retailerCustomer = (dfRetailerCustomers.loc[dfRetailerCustomers['InternalCustomerID']
+                                                    == internalCustomerID]).to_dict('list')
+        # print(dfRetailerCustomers)
+        print('dump retailer info:')
+        # print(retailerCustomer)
+        print(retailerCustomer['InternalCustomerID'][0])
+        print(retailerCustomer['TABCPermitNumber'][0])
+        print(retailerCustomer['TaxID'][0])
+        print(retailerCustomer['RetailerName'][0])
+        print(retailerCustomer['RetailerStreetAddr'][0])
+        print(retailerCustomer['RetailerCity'][0])
+        print(retailerCustomer['RetailerState'][0])
+        print(retailerCustomer['RetailerFiveDigitZip'][0])
+
+        # get information about the product related to this transaction
+        productID = row[dfTransactions.columns.get_loc('ProductID')]
+        product = (dfProducts.loc[dfProducts['ProductID'] == productID]).to_dict('list')
+
+        # print(product)
+
+        print('dump product info:')
+        print(product['ProductID'][0])
+        print(product['ComptrollerBeverageClass'][0])
+        print(product['UPC'][0])
+        print(product['BrandName'][0])
+
+        # format outputs based on comptroller spec above
+        # 1. Seller's TABC Permit or License Numbers
+        outputSellerTABCPermitNumber = ''
+        # TODO - based on beverage class...  beer is one license, ale is a different license
+
+        # 2. Retailer's/Purchaser's TABC Permit or License Number
+        outputRetailerTABCPermitNumber = retailerCustomer['TABCPermitNumber'][0]
+        # 3. Retailer's/Purchaser's Tax Identification Number
+        outputRetailerTXTaxpayerNumber = retailerCustomer['TaxID'][0]
+        # 4. Retailer's/Purchaser's Name
+        outputRetailerName = retailerCustomer['RetailerName'][0]
+        # 5. Retailer's Street Address
+        outputRetailerStreetAddr = retailerCustomer['RetailerStreetAddr'][0]
+        # 6. Retailer's City
+        outputRetailerCity = retailerCustomer['RetailerCity'][0]
+        # 7. Retailer’s State
+        outputRetailerState = retailerCustomer['RetailerState'][0]
+        # 8. Retailer's Five Digit Zip Code
+        outputRetailerZip = retailerCustomer['RetailerFiveDigitZip'][0]
+        # 9. Beverage Class
+        outputBeverageClass = product['ComptrollerBeverageClass'][0]
+        # 10. Universal Product Code
+        outputUPC = product['UPC'][0]
+        # 11. Brand Name
+        outputBrandName = product['BrandName'][0]
+        # 12. Individual Container Size
+        outputIndividualContainerSize = str(row[dfTransactions.columns.get_loc('ContainerSize')]) + \
+                                        row[dfTransactions.columns.get_loc('ContainerUnits')]
+        # 13. Number of Containers
+        #TODO need to get the number of containers and the selling price into the data model somewhere
+        # 14. Selling Price
