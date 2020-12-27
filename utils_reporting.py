@@ -9,6 +9,15 @@ def is_current_reporting_period(transactiondate):
     return start_day_of_prev_month <= transactiondate <= last_day_of_prev_month
 
 
+# return TABC 111 brewing, LLC license number based on comptroller beverage class
+def get_111_license(comptroller_beverage_class):
+    if comptroller_beverage_class == 'ML':
+        # return ale TABC license number
+        return 'B1050482'
+    else:
+        return 'BA1050483'
+
+
 # TABC
 # Malt Liquor
 '''
@@ -269,7 +278,7 @@ productsPath = 'Products.xlsx'
 retailerCustomersPath = 'RetailerCustomers.xlsx'
 transactionsPath = 'Transactions.xlsx'
 
-# load in excel sheets as pandas data frames
+# load excel sheets as pandas data frames
 dfInv = pd.io.excel.read_excel(invPath)
 dfProducts = pd.io.excel.read_excel(productsPath)
 dfRetailerCustomers = pd.io.excel.read_excel(retailerCustomersPath)
@@ -334,9 +343,7 @@ for row in dfTransactions.itertuples(index=False):
 
         # format outputs based on comptroller spec above
         # 1. Seller's TABC Permit or License Numbers
-        outputSellerTABCPermitNumber = ''
-        # TODO - based on beverage class...  beer is one license, ale is a different license
-
+        outputSellerTABCPermitNumber = get_111_license(product['ComptrollerBeverageClass'][0])
         # 2. Retailer's/Purchaser's TABC Permit or License Number
         outputRetailerTABCPermitNumber = retailerCustomer['TABCPermitNumber'][0]
         # 3. Retailer's/Purchaser's Tax Identification Number
@@ -363,3 +370,4 @@ for row in dfTransactions.itertuples(index=False):
         # 13. Number of Containers
         #TODO need to get the number of containers and the selling price into the data model somewhere
         # 14. Selling Price
+        print(outputSellerTABCPermitNumber)
