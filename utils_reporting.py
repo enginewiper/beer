@@ -341,6 +341,8 @@ for row in dfTransactions.itertuples(index=False):
         print(product['UPC'][0])
         print(product['BrandName'][0])
 
+
+        # comptroller reporting
         # format outputs based on comptroller spec above
         # 1. Seller's TABC Permit or License Numbers
         outputSellerTABCPermitNumber = get_111_license(product['ComptrollerBeverageClass'][0])
@@ -364,10 +366,11 @@ for row in dfTransactions.itertuples(index=False):
         outputUPC = product['UPC'][0]
         # 11. Brand Name
         outputBrandName = product['BrandName'][0]
-        # 12. Individual Container Size
+        # 12. Individual Container Size, string concat with units
         outputIndividualContainerSize = str(row[dfTransactions.columns.get_loc('ContainerSize')]) + \
                                         row[dfTransactions.columns.get_loc('ContainerUnits')]
         # 13. Number of Containers
         #TODO need to get the number of containers and the selling price into the data model somewhere
         # 14. Selling Price
+        # for the reporting period, sum the total number of containers and extended price of each sold package type.
         print(outputSellerTABCPermitNumber)
