@@ -47,3 +47,8 @@ class TABCForm235:
         sheet['B28'] = self.line14
 
         book.save('complete_forms/TABC235.xlsx')
+
+
+sheet235 = TABCForm235()
+
+sheet235.fill235()
