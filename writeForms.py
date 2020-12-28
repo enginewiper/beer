@@ -2,9 +2,14 @@ from shutil import copyfile
 from openpyxl import load_workbook
 
 
-def new235():  # make a blank copy of a form
+def new235():  # make a blank copy of a 235 form
     # Puts a new 235 form in complete_forms to be filled out by fill235 method
     copyfile("form_templates/235.xlsx", "complete_forms/TABC235.xlsx")
+
+
+def new236():  # make a blank copy of a 236 form
+    # Puts a new 236 form in complete_forms to be filled out by fill236 method
+    copyfile("form_templates/236.xlsx", "complete_forms/TABC236.xlsx")
 
 
 '''
@@ -47,24 +52,34 @@ class TABCForm235:
         book.save('complete_forms/TABC235.xlsx')
 
 
-<<<<<<< HEAD
-'''
-# Testing form filler script
-form1 = TABCForm235()
-form1.line1 = 100
-form1.line2 = 100
-form1.line3 = 10
-form1.line4 = 0
-form1.line6 = 110
-form1.line7 = 50
-form1.line8 = 0
-form1.line12 = 50
-form1.line13 = 0
-form1.line14 = 0
-form1.fill235()
-'''
-=======
-sheet235 = TABCForm235()
+class TABCForm236:
+    def __init__(self):
+        self.line1 = 0
+        self.line2 = 0
+        self.line3 = 0
+        self.line4 = 0
+        self.line6 = 0
+        self.line7 = 0
+        self.line8 = 0
+        self.line12 = 0
+        self.line13 = 0
+        self.line14 = 0
+        self.authorizedCredits = 0
 
-sheet235.fill235()
->>>>>>> 3240fa36ee5d74dfee11cab9ab8af561b3507a7c
+    def fill236(self):  # fill out a 236 form using object data
+        new235()  # make a new 236 form to fill out
+        book = load_workbook('form_templates/236.xlsx')
+        sheet = book.active
+        # fill blank lines
+        sheet['B14'] = self.line1
+        sheet['B15'] = self.line2
+        sheet['B16'] = self.line3
+        sheet['B17'] = self.line4
+        sheet['B19'] = self.line6
+        sheet['B20'] = self.line7
+        sheet['B21'] = self.line8
+        sheet['B26'] = self.line12
+        sheet['B27'] = self.line13
+        sheet['B28'] = self.line14
+
+        book.save('complete_forms/TABC236.xlsx')
