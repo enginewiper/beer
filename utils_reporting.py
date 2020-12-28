@@ -78,7 +78,7 @@ class Transaction:
             'seller_tabc_permit_number': self.seller_tabc_permit_number,
             'retailer_tabc_permit_number': self.retailer_tabc_permit_number,
             'retailer_tx_taxpayer_number': self.retailer_tx_taxpayer_number,
-            'retailer_street_name': self.retailer_name,
+            'retailer_name': self.retailer_name,
             'retailer_street_addr': self.retailer_street_addr,
             'retailer_city': self.retailer_city,
             'retailer_state': self.retailer_state,
@@ -478,6 +478,18 @@ for row in dfTransactions.itertuples(index=False):
 dfComptroller = pd.DataFrame([transaction.to_dict() for transaction in transactions])
 # dfComptroller = dfComptroller.round({'selling_price': 0})
 # dfComptroller = dfComptroller.astype({'selling_price': int})
-with pd.option_context('display.max_rows', None, 'display.max_columns', None):
-    print(dfComptroller)
+#filter to remove transactions from 111 brewing
+dfComptroller = dfComptroller.loc[~dfComptroller['retailer_name'].str.contains('111 Brewing, LLC')]
+Total = dfComptroller.loc[dfComptroller['product_brandname'].str.contains('Say When Local Motive IPA')]
+#dfComptrollergrouped = dfComptroller.groupby('product_brandname')
 
+aggregation_functions = {'selling_price': 'sum', 'number_units': 'sum', 'retailer_name': 'first'}
+df_new = dfComptroller.groupby(dfComptroller['retailer_name']).aggregate(aggregation_functions)
+
+with pd.option_context('display.max_rows', None, 'display.max_columns', None):
+#    pass
+    print(df_new)
+#    print('print total')
+#    print(Total)
+
+#    print(dfComptroller)
