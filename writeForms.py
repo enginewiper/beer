@@ -47,6 +47,7 @@ class TABCForm235:
         book.save('complete_forms/TABC235.xlsx')
 
 
+<<<<<<< HEAD
 '''
 # Testing form filler script
 form1 = TABCForm235()
@@ -62,3 +63,8 @@ form1.line13 = 0
 form1.line14 = 0
 form1.fill235()
 '''
+=======
+sheet235 = TABCForm235()
+
+sheet235.fill235()
+>>>>>>> 3240fa36ee5d74dfee11cab9ab8af561b3507a7c
