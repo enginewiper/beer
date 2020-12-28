@@ -18,6 +18,82 @@ def get_111_license(comptroller_beverage_class):
         return 'BA1050483'
 
 
+class Transaction:
+    def __init__(self,
+                 seller_tabc_permit_number,
+                 retailer_tabc_permit_number,
+                 retailer_tx_taxpayer_number,
+                 retailer_name,
+                 retailer_street_addr,
+                 retailer_city,
+                 retailer_state,
+                 retailer_zip,
+                 comptroller_beverage_class,
+                 product_upc,
+                 product_brandname,
+                 individual_container_size,
+                 container_units,
+                 number_units,
+                 selling_price):
+        # comptroller reporting related attributes
+        # 1. Seller's TABC Permit or License Numbers
+        self.seller_tabc_permit_number = str(seller_tabc_permit_number)
+        # 2. Retailer's/Purchaser's TABC Permit or License Number
+        self.retailer_tabc_permit_number = str(retailer_tabc_permit_number)
+        # 3. Retailer's/Purchaser's Tax Identification Number
+        self.retailer_tx_taxpayer_number = str(retailer_tx_taxpayer_number)
+        # 4. Retailer's/Purchaser's Name
+        self.retailer_name = str(retailer_name)
+        # 5. Retailer's Street Address
+        self.retailer_street_addr = str(retailer_street_addr)
+        # 6. Retailer's City
+        self.retailer_city = str(retailer_city)
+        # 7. Retailer’s State
+        self.retailer_state = str(retailer_state)
+        # 8. Retailer's Five Digit Zip Code
+        self.retailer_zip = str(retailer_zip)
+        # 9. Beverage Class
+        self.comptroller_beverage_class = str(comptroller_beverage_class)
+        # 10. Universal Product Code
+        self.product_upc = str(product_upc)
+        # 11. Brand Name
+        self.product_brandname = str(product_brandname)
+        # 12. Individual Container Size, string concat with units (e.g. 32oz, 5.12G)
+        self.individual_container_size = str(individual_container_size)
+        # container units
+        self.container_units = str(container_units)
+        # display container units should be formatted as 32oz, or 5.12G
+        if container_units == 'oz':
+            self.display_container_units = str(int(individual_container_size)) + container_units
+        else:
+            self.display_container_units = str(individual_container_size) + container_units
+        # 13. Number of Containers
+        self.number_units = int(number_units)
+        # 14. Selling Price
+        self.selling_price = float(selling_price)
+
+    def to_dict(self):
+        return {
+            # 1. Seller's TABC Permit or License Numbers
+            'seller_tabc_permit_number': self.seller_tabc_permit_number,
+            'retailer_tabc_permit_number': self.retailer_tabc_permit_number,
+            'retailer_tx_taxpayer_number': self.retailer_tx_taxpayer_number,
+            'retailer_street_name': self.retailer_name,
+            'retailer_street_addr': self.retailer_street_addr,
+            'retailer_city': self.retailer_city,
+            'retailer_state': self.retailer_state,
+            'retailer_zip': self.retailer_zip,
+            'comptroller_beverage_class': self.comptroller_beverage_class,
+            'product_upc': self.product_upc,
+            'product_brandname': self.product_brandname,
+            'individual_container_size': self.individual_container_size,
+            'container_units': self.container_units,
+            'display_container_units': self.display_container_units,
+            'number_units': self.number_units,
+            'selling_price': self.selling_price
+        }
+
+
 # TABC
 # Malt Liquor
 '''
@@ -299,35 +375,38 @@ dfTransactions = pd.io.excel.read_excel(transactionsPath)
 # print(row[])
 #   print(row)
 
+transactions = []
 # figure out which transactions were in the previous month
 for row in dfTransactions.itertuples(index=False):
     # print(is_current_reporting_period(row[dfTransactions.columns.get_loc('Date')]))
     if is_current_reporting_period(row[dfTransactions.columns.get_loc('Date')]):
         # include this transaction in the list of transactions to process for reporting
-        print('dump transaction info:')
-        print(row[dfTransactions.columns.get_loc('Date')])
-        print(row[dfTransactions.columns.get_loc('ProductID')])
-        print(row[dfTransactions.columns.get_loc('InternalCustomerID')])
-        print(row[dfTransactions.columns.get_loc('ContainerSize')])
-        print(row[dfTransactions.columns.get_loc('ContainerUnits')])
-        print(row[dfTransactions.columns.get_loc('OffPrem')])
+        # print('dump transaction info:')
+        # print(row[dfTransactions.columns.get_loc('Date')])
+        # print(row[dfTransactions.columns.get_loc('ProductID')])
+        # print(row[dfTransactions.columns.get_loc('InternalCustomerID')])
+        # print(row[dfTransactions.columns.get_loc('ContainerSize')])
+        # print(row[dfTransactions.columns.get_loc('ContainerUnits')])
+        # print(row[dfTransactions.columns.get_loc('OffPrem')])
+        # print(row[dfTransactions.columns.get_loc('UnitPrice')])
+        # print(row[dfTransactions.columns.get_loc('NumUnits')])
 
         # get information about retailer customer based on internalCustomerID,
         # and convert df to dict
         internalCustomerID = row[dfTransactions.columns.get_loc('InternalCustomerID')]
         retailerCustomer = (dfRetailerCustomers.loc[dfRetailerCustomers['InternalCustomerID']
                                                     == internalCustomerID]).to_dict('list')
-        # print(dfRetailerCustomers)
-        print('dump retailer info:')
-        # print(retailerCustomer)
-        print(retailerCustomer['InternalCustomerID'][0])
-        print(retailerCustomer['TABCPermitNumber'][0])
-        print(retailerCustomer['TaxID'][0])
-        print(retailerCustomer['RetailerName'][0])
-        print(retailerCustomer['RetailerStreetAddr'][0])
-        print(retailerCustomer['RetailerCity'][0])
-        print(retailerCustomer['RetailerState'][0])
-        print(retailerCustomer['RetailerFiveDigitZip'][0])
+        # # print(dfRetailerCustomers)
+        # print('dump retailer info:')
+        # # print(retailerCustomer)
+        # print(retailerCustomer['InternalCustomerID'][0])
+        # print(retailerCustomer['TABCPermitNumber'][0])
+        # print(retailerCustomer['TaxID'][0])
+        # print(retailerCustomer['RetailerName'][0])
+        # print(retailerCustomer['RetailerStreetAddr'][0])
+        # print(retailerCustomer['RetailerCity'][0])
+        # print(retailerCustomer['RetailerState'][0])
+        # print(retailerCustomer['RetailerFiveDigitZip'][0])
 
         # get information about the product related to this transaction
         productID = row[dfTransactions.columns.get_loc('ProductID')]
@@ -335,12 +414,11 @@ for row in dfTransactions.itertuples(index=False):
 
         # print(product)
 
-        print('dump product info:')
-        print(product['ProductID'][0])
-        print(product['ComptrollerBeverageClass'][0])
-        print(product['UPC'][0])
-        print(product['BrandName'][0])
-
+        # print('dump product info:')
+        # print(product['ProductID'][0])
+        # print(product['ComptrollerBeverageClass'][0])
+        # print(product['UPC'][0])
+        # print(product['BrandName'][0])
 
         # comptroller reporting
         # format outputs based on comptroller spec above
@@ -366,11 +444,40 @@ for row in dfTransactions.itertuples(index=False):
         outputUPC = product['UPC'][0]
         # 11. Brand Name
         outputBrandName = product['BrandName'][0]
-        # 12. Individual Container Size, string concat with units
-        outputIndividualContainerSize = str(row[dfTransactions.columns.get_loc('ContainerSize')]) + \
-                                        row[dfTransactions.columns.get_loc('ContainerUnits')]
+        # 12. Individual Container Size
+        outputContainerUnits = row[dfTransactions.columns.get_loc('ContainerUnits')]
+        outputIndividualContainerSize = row[dfTransactions.columns.get_loc('ContainerSize')]
+        outputDisplayIndividualContainerSize = str(row[dfTransactions.columns.get_loc('ContainerSize')]) + \
+                                               outputContainerUnits
         # 13. Number of Containers
-        #TODO need to get the number of containers and the selling price into the data model somewhere
+        outputNumberUnits = row[dfTransactions.columns.get_loc('NumUnits')]
         # 14. Selling Price
-        # for the reporting period, sum the total number of containers and extended price of each sold package type.
-        print(outputSellerTABCPermitNumber)
+        outputSellingPrice = row[dfTransactions.columns.get_loc('UnitPrice')]
+
+        transactions.append(Transaction(seller_tabc_permit_number=outputSellerTABCPermitNumber,
+                                        retailer_tabc_permit_number=outputRetailerTABCPermitNumber,
+                                        retailer_tx_taxpayer_number=outputRetailerTXTaxpayerNumber,
+                                        retailer_name=outputRetailerName,
+                                        retailer_street_addr=outputRetailerStreetAddr,
+                                        retailer_city=outputRetailerCity,
+                                        retailer_state=outputRetailerState,
+                                        retailer_zip=outputRetailerZip,
+                                        comptroller_beverage_class=outputBeverageClass,
+                                        product_upc=outputUPC,
+                                        product_brandname=outputBrandName,
+                                        individual_container_size=outputIndividualContainerSize,
+                                        container_units=outputContainerUnits,
+                                        number_units=outputNumberUnits,
+                                        selling_price=outputSellingPrice)
+                            )
+# transactions is a list of all transaction objects for the reporting period.
+# sum the total number of containers and extended price for each package type to each retailer.
+# for transaction in transactions:
+#     print(transaction.to_dict())
+
+dfComptroller = pd.DataFrame([transaction.to_dict() for transaction in transactions])
+# dfComptroller = dfComptroller.round({'selling_price': 0})
+# dfComptroller = dfComptroller.astype({'selling_price': int})
+with pd.option_context('display.max_rows', None, 'display.max_columns', None):
+    print(dfComptroller)
+
