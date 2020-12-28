@@ -1,11 +1,9 @@
 from shutil import copyfile
-from openpyxl import Workbook
-
-# make a blank copy of a form
+from openpyxl import load_workbook
 
 
-def new235():
-    # Puts a new 235 form in complete_forms to be filled out
+def new235():  # make a blank copy of a form
+    # Puts a new 235 form in complete_forms to be filled out by fill235 method
     copyfile("form_templates/235.xlsx", "complete_forms/TABC235.xlsx")
 
 
@@ -30,9 +28,9 @@ class TABCForm235:
         self.line14 = 0  # Total beer sold for Off-Premise consumption
         self.authorizedCredits = 0  # attach tabc letter
 
-    def fill235(self):
+    def fill235(self):  # fill out a 235 form using object data
         new235()  # make a new 235 form to fill out
-        book = Workbook()
+        book = load_workbook('form_templates/235.xlsx')
         sheet = book.active
         # fill blank lines
         sheet['B14'] = self.line1
@@ -47,3 +45,20 @@ class TABCForm235:
         sheet['B28'] = self.line14
 
         book.save('complete_forms/TABC235.xlsx')
+
+
+'''
+# Testing form filler script
+form1 = TABCForm235()
+form1.line1 = 100
+form1.line2 = 100
+form1.line3 = 10
+form1.line4 = 0
+form1.line6 = 110
+form1.line7 = 50
+form1.line8 = 0
+form1.line12 = 50
+form1.line13 = 0
+form1.line14 = 0
+form1.fill235()
+'''
