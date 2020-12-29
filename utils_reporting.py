@@ -480,11 +480,15 @@ dfComptroller = pd.DataFrame([transaction.to_dict() for transaction in transacti
 # dfComptroller = dfComptroller.astype({'selling_price': int})
 #filter to remove transactions from 111 brewing
 dfComptroller = dfComptroller.loc[~dfComptroller['retailer_name'].str.contains('111 Brewing, LLC')]
-Total = dfComptroller.loc[dfComptroller['product_brandname'].str.contains('Say When Local Motive IPA')]
+# Total = dfComptroller.loc[dfComptroller['product_brandname'].str.contains('Say When Local Motive IPA')]
 #dfComptrollergrouped = dfComptroller.groupby('product_brandname')
 
-aggregation_functions = {'selling_price': 'sum', 'number_units': 'sum', 'retailer_name': 'first'}
-df_new = dfComptroller.groupby(dfComptroller['retailer_name']).aggregate(aggregation_functions)
+aggregation_functions = {'selling_price': 'sum', 'number_units': 'sum'}
+#, 'retailer_name': 'first'}
+#df_new = dfComptroller.groupby(dfComptroller['retailer_name', 'product_brandname']).aggregate(aggregation_functions)
+df_new = dfComptroller.groupby(['retailer_name', 'product_brandname']).agg(aggregation_functions)
+df_new.columns = ['total_price', 'total_units']
+df_new = df_new.reset_index()
 
 with pd.option_context('display.max_rows', None, 'display.max_columns', None):
 #    pass
