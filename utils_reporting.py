@@ -483,12 +483,38 @@ dfComptroller = dfComptroller.loc[~dfComptroller['retailer_name'].str.contains('
 # Total = dfComptroller.loc[dfComptroller['product_brandname'].str.contains('Say When Local Motive IPA')]
 #dfComptrollergrouped = dfComptroller.groupby('product_brandname')
 
-aggregation_functions = {'selling_price': 'sum', 'number_units': 'sum'}
+aggregation_functions = {'seller_tabc_permit_number': 'first',
+                         'retailer_tabc_permit_number': 'first',
+                         'retailer_tx_taxpayer_number': 'first',
+                         'retailer_street_addr': 'first',
+                         'retailer_city': 'first',
+                         'retailer_state': 'first',
+                         'retailer_zip': 'first',
+                         'comptroller_beverage_class': 'first',
+                         'product_upc': 'first',
+                         'individual_container_size': 'first',
+                         'container_units': 'first',
+                         'selling_price': 'sum',
+                         'number_units': 'sum'}
 #, 'retailer_name': 'first'}
 #df_new = dfComptroller.groupby(dfComptroller['retailer_name', 'product_brandname']).aggregate(aggregation_functions)
 df_new = dfComptroller.groupby(['retailer_name', 'product_brandname']).agg(aggregation_functions)
-df_new.columns = ['total_price', 'total_units']
+df_new.columns = ['seller_tabc_permit_number',
+                  'retailer_tabc_permit_number',
+                  'retailer_tx_taxpayer_number',
+                  'retailer_street_addr',
+                  'retailer_city',
+                  'retailer_state',
+                  'retailer_zip',
+                  'comptroller_beverage_class',
+                  'product_upc',
+                  'individual_container_size',
+                  'container_units',
+                  'total_price',
+                  'total_units']
 df_new = df_new.reset_index()
+#df_new = df_new.join(dfComptroller['retailer_tabc_permit_number'])
+#df_new.merge(dfComptroller.set_index('retailer_name'), on='retailer_name')
 
 with pd.option_context('display.max_rows', None, 'display.max_columns', None):
 #    pass
