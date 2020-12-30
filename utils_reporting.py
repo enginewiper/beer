@@ -1,13 +1,14 @@
 import pandas as pd
 import numpy as np
 from datetime import date, timedelta
+from pandas.io import excel
 
 
 # is a transaction date within the previous month? boolean
-def is_current_reporting_period(transactiondate):
+def is_current_reporting_period(transaction_date):
     last_day_of_prev_month = date.today().replace(day=1) - timedelta(days=1)
     start_day_of_prev_month = date.today().replace(day=1) - timedelta(days=last_day_of_prev_month.day)
-    return start_day_of_prev_month <= transactiondate <= last_day_of_prev_month
+    return start_day_of_prev_month <= transaction_date <= last_day_of_prev_month
 
 
 # return TABC 111 brewing, LLC license number based on comptroller beverage class
@@ -17,6 +18,14 @@ def get_111_license(comptroller_beverage_class):
         return 'B1050482'
     else:
         return 'BA1050483'
+
+
+#return the prefix for the output filename (year_lastmonth_)
+def get_output_file_name_prefix():
+    today = date.today()
+    first = today.replace(day=1)
+    last_month = first - timedelta(days=1)
+    return last_month.strftime("%Y_%m_")
 
 
 class Transaction:
@@ -141,7 +150,7 @@ Required Compliance Totals
 14.  Total Beer Sold for Off-Premise Consumption		
 15.  Total Taxable Sales* (Sum of Lines 12,13, & 14)	
 *The sum of lines 12, 13, and 14 (Line 15) should be less than or equal to Line 10. 		
-		
+
 GROSS TAX DUE (Line 10 x 11)
 LESS 2% (If payment received by due date)   	
 LESS AUTHORIZED CREDITS (Attach TABC letter)		
@@ -196,8 +205,8 @@ for row in dfTransactions.itertuples(index=False):
         # 12. Individual Container Size
         outputContainerUnits = row[dfTransactions.columns.get_loc('ContainerUnits')]
         outputIndividualContainerSize = row[dfTransactions.columns.get_loc('ContainerSize')]
-        outputDisplayIndividualContainerSize = str(row[dfTransactions.columns.get_loc('ContainerSize')]) + \
-                                               outputContainerUnits
+        outputDisplayIndividualContainerSize = \
+            str(row[dfTransactions.columns.get_loc('ContainerSize')]) + outputContainerUnits
         # 13. Number of Containers
         outputNumberUnits = row[dfTransactions.columns.get_loc('NumUnits')]
         # 14. Selling Price
@@ -277,6 +286,7 @@ df_new = df_new[cols]
 df_new = df_new.round({'total_price': 0})
 df_new['total_price'] = df_new['total_price'].apply(np.int64)
 # output to csv
-df_new.to_csv('complete_forms/comptroller.csv', index=False, header=False)
+comptrollerOutputFileName = 'complete_forms/' + get_output_file_name_prefix() + 'comptroller.csv'
+df_new.to_csv(comptrollerOutputFileName, index=False, header=False)
 # with pd.option_context('display.max_rows', None, 'display.max_columns', None):
 #    print(df_new)
