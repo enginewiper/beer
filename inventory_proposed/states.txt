@@ -1,0 +1,25 @@
+H column is state of the keg
+
+1. NEW
+keg brewed, ready to be assigned to a customerID/whatever
+2. SOLD
+keg has been sold, row will no longer be used
+same keg can be added into the database later as NEW
+3. DEAD
+keg is decomissioned or lost
+
+
+possible states:
+MT
+keg is empty/sitting waiting to be washed/used (this state might not be nessecary)
+
+USED
+if you use the keg to fill other containers (bottles etc), mark the row status as USED
+this way it won't be marked as SOLD
+the smaller containers that are filled by that keg would have a status of FULL
+
+FULL-X
+for smaller containers that were filled from a keg
+X is for the serial number of the keg that the beer came from (could be used for QC)
+
+Maybe could use a different spreadsheet for bottles/growlers, and keep the kegs in their own spreadsheet
