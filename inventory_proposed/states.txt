@@ -23,4 +23,3 @@ for smaller containers that were filled from a keg
 X is for the serial number of the keg that the beer came from (could be used for QC)
 
 Maybe could use a different spreadsheet for bottles/growlers, and keep the kegs in their own spreadsheet
-this way the serial number from the keg could be stored in a seperate column, also would be easier to migrate to sql later on
