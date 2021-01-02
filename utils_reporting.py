@@ -28,6 +28,14 @@ def get_output_file_name_prefix():
     return last_month.strftime("%Y_%m_")
 
 
+#return the prefix for the previous month's report name (year_month before last_)
+def get_previous_report_name_prefix():
+    today = date.today()
+    first = today.replace(day=1)
+    last_month = first - timedelta(days=32)
+    return last_month.strftime("%Y_%m_")
+
+
 class Transaction:
     def __init__(self,
                  seller_tabc_permit_number,

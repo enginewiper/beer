@@ -3,21 +3,47 @@ import numpy as np
 from datetime import date, timedelta
 from pandas.io import excel
 from openpyxl import load_workbook
+import utils_reporting
 
 
 
-def get_previous_report_name_prefix():
-    today = date.today()
-    first = today.replace(day=1)
-    last_month = first - timedelta(days=32)
-    return last_month.strftime("%Y_%m_")
+# set paths
+invPath = 'Inventory.xlsx'
+productsPath = 'Products.xlsx'
+retailerCustomersPath = 'RetailerCustomers.xlsx'
+transactionsPath = 'Transactions.xlsx'
+
+# load excel sheets as pandas data frames
+dfInv = pd.io.excel.read_excel(invPath)
+dfProducts = pd.io.excel.read_excel(productsPath)
+dfRetailerCustomers = pd.io.excel.read_excel(retailerCustomersPath)
+dfTransactions = pd.io.excel.read_excel(transactionsPath)
+transactions = []
+# figure out which transactions were in the previous month
+for row in dfTransactions.itertuples(index=False):
+    if utils_reporting.is_current_reporting_period(row[dfTransactions.columns.get_loc('Date')]):
+        internalCustomerID = row[dfTransactions.columns.get_loc('InternalCustomerID')]
+        productID = row[dfTransactions.columns.get_loc('ProductID')]
+        product = (dfProducts.loc[dfProducts['ProductID'] == productID]).to_dict('list')
+        outputBeverageClass = product['ComptrollerBeverageClass'][0]
+        outputBrandName = product['BrandName'][0]
+        outputContainerUnits = row[dfTransactions.columns.get_loc('ContainerUnits')]
+        outputIndividualContainerSize = row[dfTransactions.columns.get_loc('ContainerSize')]
+        # 13. Number of Containers
+        outputNumberUnits = row[dfTransactions.columns.get_loc('NumUnits')]
+
+
+
+
+
+
+
 
 
 reports_rootdir = 'C:/!/projects/PycharmProjects/beer/reportsdir/'
 
-previous_tabc_235 = reports_rootdir + get_previous_report_name_prefix() + 'c-235.xlsx'
-previous_tabc_236 = reports_rootdir + get_previous_report_name_prefix() + 'c-236.xlsx'
-
+previous_tabc_235 = reports_rootdir + utils_reporting.get_previous_report_name_prefix() + 'c-235.xlsx'
+previous_tabc_236 = reports_rootdir + utils_reporting.get_previous_report_name_prefix() + 'c-236.xlsx'
 
 previous_tabc_235_workbook = load_workbook(previous_tabc_235, data_only=True)
 
@@ -112,3 +138,4 @@ less_authorized_credits = discount_tax_due
 
 tax_due_state = discount_tax_due
 #TODO output to current_sheet B35
+
