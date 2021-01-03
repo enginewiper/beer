@@ -1,0 +1,36 @@
+this file is pseudocode only and i need this to remember whats going on
+
+
+Array of objects
+
+class Product
+
+.brandName
+.productID
+.half_barrel_sold
+.fourth_barrel_sold
+.sixth_barrel_sold
+.24_12_sold
+.24_16_sold
+.12_32_sold
+.total_in_gallons
+
+write vars of all objects to chart
+
+1. generate the list of products
+2. put all product brandnames in alphabetical order in an array
+3. for each item in brandname, for x = 0, x < amount of products in list, x++
+	write the brandname to col A, row 6+x
+	set the object's xl_brand_row property that contains brandname to row#
+4. assign data to each property of product object
+5. write data to form
+
+
+----
+scraping data from transactions for 235
+----
+1. find row for start of reporting period = start_date_row
+2. find row for end of reporting period = end_date_row
+3. iterate from start_date_row to end_date_row
+for every row,
+containersize = string (Dx + Ex)

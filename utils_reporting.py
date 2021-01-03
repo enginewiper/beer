@@ -20,7 +20,7 @@ def get_111_license(comptroller_beverage_class):
         return 'BA1050483'
 
 
-#return the prefix for the output filename (year_lastmonth_)
+# return the prefix for the output filename (year_lastmonth_)
 def get_output_file_name_prefix():
     today = date.today()
     first = today.replace(day=1)
@@ -28,7 +28,7 @@ def get_output_file_name_prefix():
     return last_month.strftime("%Y_%m_")
 
 
-#return the prefix for the previous month's report name (year_month before last_)
+# return the prefix for the previous month's report name (year_month before last_)
 def get_previous_report_name_prefix():
     today = date.today()
     first = today.replace(day=1)
