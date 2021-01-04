@@ -294,7 +294,8 @@ df_new = df_new[cols]
 df_new = df_new.round({'total_price': 0})
 df_new['total_price'] = df_new['total_price'].apply(np.int64)
 # output to csv
-comptrollerOutputFileName = 'complete_forms/' + get_output_file_name_prefix() + 'comptroller.csv'
+comptrollerOutputFileName = 'C:/users/svenf/desktop/beer/complete_forms/' + get_output_file_name_prefix() + 'comptroller.csv'
 df_new.to_csv(comptrollerOutputFileName, index=False, header=False)
-# with pd.option_context('display.max_rows', None, 'display.max_columns', None):
-#    print(df_new)
+
+with pd.option_context('display.max_rows', None, 'display.max_columns', None):
+    print(df_new)

@@ -5,6 +5,19 @@ from pandas.io import excel
 from openpyxl import load_workbook
 from shutil import copyfile
 
+# Set paths for all files statically.
+invPath = 'Inventory.xlsx'
+productsPath = 'Products.xlsx'
+retailerCustomersPath = 'RetailerCustomers.xlsx'
+transactionsPath = 'Transactions.xlsx'
+
+
+# is a transaction date within the previous month? boolean
+def is_current_reporting_period(transaction_date):
+    last_day_of_prev_month = date.today().replace(day=1) - timedelta(days=1)
+    start_day_of_prev_month = date.today().replace(day=1) - timedelta(days=last_day_of_prev_month.day)
+    return start_day_of_prev_month <= transaction_date <= last_day_of_prev_month
+
 
 def get_previous_report_name_prefix():
     today = date.today()
@@ -39,31 +52,72 @@ def new236():  # make a blank copy of a 236 form for the current month and year
     return new_filename
 
 
+class Transaction:
+    def __init__(self,
+                 retailer_name,
+                 product_brandname,
+                 individual_container_size,
+                 container_units,
+                 number_units,
+                 is_off_premise,
+                 is_retailer_sale):
+        # Retailer Name
+        self.retailer_name = str(retailer_name)
+        # Brand Name
+        self.product_brandname = str(product_brandname)
+        # Individual Container Size
+        self.individual_container_size = str(individual_container_size)
+        # oz or gallons?
+        self.container_units = str(container_units)
+        # number of containers sold
+        self.number_units = int(number_units)
+        if container_units == 'oz':  # If the containers are in oz, convert to gallons, times x amount of containers
+            self.total_gallons = number_units * (individual_container_size / 128)
+        else:  # If the containers are in gallons
+            self.total_gallons = number_units * individual_container_size
+
+        self.is_off_premise = str(is_off_premise)
+        self.is_retailer_sale = is_retailer_sale
+
+    def to_dict(self):
+        return {
+            'retailer_name': self.retailer_name,
+            'product_brandname': self.product_brandname,
+            'individual_container_size': self.individual_container_size,
+            'container_units': self.container_units,
+            'number_units': self.number_units,
+            'total_gallons': self.total_gallons
+        }
+
+
 class Product:
     def __init__(self, d, a, b):  # Product name, product ID, is it liquor or not (0 or 1)?
-        self.xl_brand_row = 0  # Used to find which row of the tax form that the product data will be written to.
+        self.alphabetical_order = 0  # Used to find which row of the tax form that the product data will be written to.
         self.brandName = d
         self.productID = a
         self.isLiquor = b
-        self.half_barrel_sold_ONP = 0  # ON PREMISE SALES
-        self.fourth_barrel_sold_ONP = 0
-        self.sixth_barrel_sold_ONP = 0
-        self.twentyfour_twelve_sold_ONP = 0
-        self.twentyfour_sixteen_sold_ONP = 0
-        self.twelve_thirtytwo_sold_ONP = 0
-        self.sixtyfour_oz_sold_ONP = 0
-        self.thirtytwo_oz_sold_ONP = 0
-        self.sixteen_oz_sold_ONP = 0
-        self.half_barrel_sold_OFFP = 0  # OFF PREMISE SALES
-        self.fourth_barrel_sold_OFFP = 0
-        self.sixth_barrel_sold_OFFP = 0
-        self.twentyfour_twelve_sold_OFFP = 0
-        self.twentyfour_sixteen_sold_OFFP = 0
-        self.twelve_thirtytwo_sold_OFFP = 0
-        self.sixtyfour_oz_sold_OFFP = 0
-        self.thirtytwo_oz_sold_OFFP = 0
-        self.sixteen_oz_sold_OFFP = 0
-        self.total_sold_in_gallons = 0
+        self.ONP_half_barrel_sold = 0  # ON PREMISE SALES
+        self.ONP_fourth_barrel_sold = 0
+        self.ONP_sixth_barrel_sold = 0
+        self.ONP_twentyfour_twelve_sold = 0
+        self.ONP_twentyfour_sixteen_sold = 0
+        self.ONP_twelve_thirtytwo_sold = 0
+        self.ONP_sixtyfour_oz_sold = 0
+        self.ONP_thirtytwo_oz_sold = 0
+        self.ONP_sixteen_oz_sold = 0
+        self.ONP_total_gallons_sold = 0
+        self.OFFP_half_barrel_sold = 0  # OFF PREMISE SALES
+        self.OFFP_fourth_barrel_sold = 0
+        self.OFFP_sixth_barrel_sold = 0
+        self.OFFP_twentyfour_twelve_sold = 0
+        self.OFFP_twentyfour_sixteen_sold = 0
+        self.OFFP_twelve_thirtytwo_sold = 0
+        self.OFFP_sixtyfour_oz_sold = 0
+        self.OFFP_thirtytwo_oz_sold = 0
+        self.OFFP_sixteen_oz_sold = 0
+        self.OFFP_total_gallons_sold = 0
+        self.RTL_sixth_barrel_sold = 0  # RETAILER SALES (add different container types below this line)
+        self.RTL_total_gallons_sold = 0
 
 
 # puts product data into an array of objects
@@ -238,4 +292,4 @@ tax_due_state = discount_tax_due
 # TODO output to current_sheet B35
 
 
-test_product_list("Products.xlsx")  # IT WORKS!
+# test_product_list(productsPath)
