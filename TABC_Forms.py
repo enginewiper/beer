@@ -54,70 +54,83 @@ def new236():  # make a blank copy of a 236 form for the current month and year
 
 class Transaction:
     def __init__(self,
-                 retailer_name,
-                 product_brandname,
+                 product_id,
                  individual_container_size,
                  container_units,
                  number_units,
                  is_off_premise,
                  is_retailer_sale):
-        # Retailer Name
-        self.retailer_name = str(retailer_name)
-        # Brand Name
-        self.product_brandname = str(product_brandname)
-        # Individual Container Size
-        self.individual_container_size = str(individual_container_size)
-        # oz or gallons?
-        self.container_units = str(container_units)
-        # number of containers sold
-        self.number_units = int(number_units)
+        self.product_id = str(product_id)  # Product ID
+        self.individual_container_size = str(individual_container_size)  # Individual Container Size
+        self.container_units = str(container_units)  # oz or gallons?
+        self.number_units = int(number_units)  # number of containers sold
         if container_units == 'oz':  # If the containers are in oz, convert to gallons, times x amount of containers
             self.total_gallons = number_units * (individual_container_size / 128)
         else:  # If the containers are in gallons
             self.total_gallons = number_units * individual_container_size
 
         self.is_off_premise = str(is_off_premise)
-        self.is_retailer_sale = is_retailer_sale
-
-    def to_dict(self):
-        return {
-            'retailer_name': self.retailer_name,
-            'product_brandname': self.product_brandname,
-            'individual_container_size': self.individual_container_size,
-            'container_units': self.container_units,
-            'number_units': self.number_units,
-            'total_gallons': self.total_gallons
-        }
+        self.is_retailer_sale = is_retailer_sale  # 0 or 1
+        self.product_list_index = 0  # Index of the product in the product list array. TBD
 
 
 class Product:
-    def __init__(self, d, a, b):  # Product name, product ID, is it liquor or not (0 or 1)?
+    def __init__(self, brandName, productID, isLiquor):  # Product name, product ID, is it liquor or not (0 or 1)?
         self.alphabetical_order = 0  # Used to find which row of the tax form that the product data will be written to.
-        self.brandName = d
-        self.productID = a
-        self.isLiquor = b
-        self.ONP_half_barrel_sold = 0  # ON PREMISE SALES
-        self.ONP_fourth_barrel_sold = 0
-        self.ONP_sixth_barrel_sold = 0
-        self.ONP_twentyfour_twelve_sold = 0
-        self.ONP_twentyfour_sixteen_sold = 0
-        self.ONP_twelve_thirtytwo_sold = 0
-        self.ONP_sixtyfour_oz_sold = 0
-        self.ONP_thirtytwo_oz_sold = 0
-        self.ONP_sixteen_oz_sold = 0
-        self.ONP_total_gallons_sold = 0
-        self.OFFP_half_barrel_sold = 0  # OFF PREMISE SALES
-        self.OFFP_fourth_barrel_sold = 0
-        self.OFFP_sixth_barrel_sold = 0
-        self.OFFP_twentyfour_twelve_sold = 0
-        self.OFFP_twentyfour_sixteen_sold = 0
-        self.OFFP_twelve_thirtytwo_sold = 0
-        self.OFFP_sixtyfour_oz_sold = 0
-        self.OFFP_thirtytwo_oz_sold = 0
-        self.OFFP_sixteen_oz_sold = 0
-        self.OFFP_total_gallons_sold = 0
+        self.brandName = str(brandName)
+        self.productID = str(productID)
+        self.isLiquor = isLiquor  # TODO: change this to a boolean type
+        self.ONP_total_gallons_sold = 0  # ON PREMISE SALES total gallons (will need to convert units to gallons before inputting)
+        self.OFFP_total_gallons_sold = 0  # OFF PREMISE SALES
         self.RTL_sixth_barrel_sold = 0  # RETAILER SALES (add different container types below this line)
+        self.RTL_twentytwo_oz_bottle_sold = 0
         self.RTL_total_gallons_sold = 0
+
+
+def generate_transaction_list():  # Generate a list of Transaction objects with data needed for both forms.
+    transactions = []
+    dfTransactions = pd.io.excel.read_excel(transactionsPath)
+    # dfProducts = pd.io.excel.read_excel(productsPath)
+
+    for row in dfTransactions.itertuples(index=False):  # iterate through all rows in dataframe
+        if is_current_reporting_period(row[dfTransactions.columns.get_loc('Date')]):  # Getting data into local vars
+            productID = row[dfTransactions.columns.get_loc('ProductID')]  # Getting product ID into local var
+            outputIndividualContainerSize = row[
+                dfTransactions.columns.get_loc('ContainerSize')]  # Getting container size #
+            outputContainerUnits = row[
+                dfTransactions.columns.get_loc('ContainerUnits')]  # Getting units (oz or gallons?)
+            outputNumberUnits = row[dfTransactions.columns.get_loc('NumUnits')]  # Getting number of containers sold
+            isOffPremise = row[dfTransactions.columns.get_loc('OffPrem')]  # is it off premise or on premise
+            if isOffPremise == "TRUE":
+                isOffPremise = 1
+            elif isOffPremise == "FALSE":
+                isOffPremise = 0
+            internalCustomerID = row[dfTransactions.columns.get_loc('InternalCustomerID')]  # internal customer id
+            cxid = int(internalCustomerID)  # Converting internal customer ID to an int.
+            is_rtl_sale = 0  # boolean, 0 or 1
+            if cxid != 1:  # If internal customer ID is not 1, it's a retailer sale.
+                is_rtl_sale = 1
+            elif cxid == 1:
+                is_rtl_sale = 0
+            transactions.append(Transaction(product_id=productID,
+                                            individual_container_size=outputIndividualContainerSize,
+                                            container_units=outputContainerUnits,
+                                            number_units=outputNumberUnits,
+                                            is_off_premise=isOffPremise,
+                                            is_retailer_sale=is_rtl_sale)
+                                )
+    return transactions
+
+
+def test_transaction_list(transaction_list_name):
+    test_list = transaction_list_name
+    for x in range(0, len(test_list)):
+        print("PRODUCT ID:" + test_list[x].product_id)
+        print(str(test_list[x].number_units) + " of " + str(test_list[x].individual_container_size) + test_list[x].container_units)
+        print("Off premise: " + test_list[x].is_off_premise)
+        if test_list[x].is_retailer_sale == 1:
+            print ("(Retailer sale)")
+        print("\n")
 
 
 # puts product data into an array of objects
@@ -147,7 +160,7 @@ def generate_product_list(product_book):  # Put file path / filename for Product
 
 def test_product_list(pbook):
     test_list = generate_product_list(pbook)
-    for x in range(0, 3):
+    for x in range(0, len(test_list)):
         print("BRAND NAME:")
         print(test_list[x].brandName)
         print(" PRODUCT ID:")
@@ -196,11 +209,56 @@ class Current235:  # Class that holds data to be put in the new 235 form.
         self.tax_due_state = 0
 
 
+class Current236:  # Class that holds data to be put in the new 235 form.
+    def __init__(self):
+        # new235 will return the filename after creating a new form
+        self.filename = new236()
+        # Summary Page Variables
+        self.line1 = 0  # Inventory, Beginning of month
+        self.line2 = 0  # Ale/Malt Liquor Manufactured
+        self.line3 = 0  # Ale/Malt Liquor Imported
+        self.line4 = 0  # Ale/Malt Liquor Returned from TX Distributors
+        self.line5 = 0  # Total Ale/Malt Liquor Available
+        self.line6 = 0  # Inventory, End of month
+        self.line7 = 0  # Distributor sales
+        self.line8 = 0  # Other Exemptions
+        self.line9 = 0  # Total Exemptions
+        self.line10 = 0  # Ale/Malt Liquor subject to taxation
+        self.line12 = 0  # Total Ale/Malt Liquor sold to retailers
+        self.line13 = 0  # Total Ale/Malt Liquor sold for on-premise consumption
+        self.line14 = 0  # Total Ale/Malt Liquor sold for off-premise consumption
+        self.line15 = 0  # Total taxable sales
+        self.tax_rate_per_gallon = (self.filename['Summary Page'])['B24'].value
+        self.grosstax = 0  # Gross Tax Due
+        self.less_2percent = 0
+        self.less_authorized_credits = 0
+        self.tax_due_state = 0
+
+
+array_transaction_data = generate_transaction_list()
+array_products = generate_product_list("Products.xlsx")
 prev_235_form = PreviousForm(previous_tabc_235_filename)  # Creating object using filename as parameter.
 
-# print(previous_tabc_235_workbook.sheetnames)
-# >>> ['Summary Page', 'Schedules', 'Brand Summary Sold', 'Supplemental Schedule']
-print((prev_235_form.workbook['Summary Page'])['B18'].value)
+test_transaction_list(array_transaction_data)
+'''  work on this stuff later
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # 1.   Inventory, Beginning of Month  (Line 6 on Prior Monthly Report)
@@ -293,3 +351,4 @@ tax_due_state = discount_tax_due
 
 
 # test_product_list(productsPath)
+'''

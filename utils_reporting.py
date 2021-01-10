@@ -177,10 +177,10 @@ transactionsPath = 'Transactions.xlsx'
 dfInv = pd.io.excel.read_excel(invPath)
 dfProducts = pd.io.excel.read_excel(productsPath)
 dfRetailerCustomers = pd.io.excel.read_excel(retailerCustomersPath)
-dfTransactions = pd.io.excel.read_excel(transactionsPath)
+dfTransactions = pd.io.excel.read_excel(transactionsPath)  # loading transactions sheet into a pandas dataframe
 transactions = []
 # figure out which transactions were in the previous month
-for row in dfTransactions.itertuples(index=False):
+for row in dfTransactions.itertuples(index=False):  # iterate through all rows in dataframe
     if is_current_reporting_period(row[dfTransactions.columns.get_loc('Date')]):
         internalCustomerID = row[dfTransactions.columns.get_loc('InternalCustomerID')]
         retailerCustomer = (dfRetailerCustomers.loc[dfRetailerCustomers['InternalCustomerID']
