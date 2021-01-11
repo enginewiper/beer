@@ -1,10 +1,11 @@
 H column is state of the keg
+Need to add a new row to spreadsheet every time something happens to a keg.
 
 #Keg states:
 #I think keg states should be:
     0 - checked in, needs to be washed/filled
-    1 - full of product, in taxable inventory from tabc perspective
-    2 - checked out, assigned to an internal customer ID, meaning we have to pay taxes on this keg
+    1 - Manufactured/new  //  full of product, in taxable inventory from tabc perspective
+    2 - Left inventory    //  checked out, assigned to an internal customer ID, meaning we have to pay taxes on this keg
     3 - decommissioned/end of life
     4 - lost/stolen (same as decommissioned but might be useful to track separately)
 
